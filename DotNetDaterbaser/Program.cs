@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using Microsoft.Data.SqlClient;
 
 namespace DotNetDaterbaser
@@ -137,8 +138,27 @@ namespace DotNetDaterbaser
         {
             using var connection = new SqlConnection(connectionString);
             await connection.OpenAsync().ConfigureAwait(false);
-            using var command = new SqlCommand(sql, connection);
-            await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+
+            foreach (var batch in SplitSqlBatches(sql))
+            {
+                using var command = new SqlCommand(batch, connection);
+                await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+            }
+        }
+
+        /// <summary>
+        /// Splits a SQL script into batches separated by GO statements.
+        /// </summary>
+        /// <param name="sql">The script to split.</param>
+        /// <returns>The list of individual batches.</returns>
+        private static IEnumerable<string> SplitSqlBatches(string sql)
+        {
+            var batches = Regex.Split(
+                sql,
+                @"^\s*GO\s*(?:\r?\n|$)",
+                RegexOptions.Multiline | RegexOptions.IgnoreCase);
+
+            return batches.Where(static batch => !string.IsNullOrWhiteSpace(batch));
         }
     }
 }
