@@ -45,13 +45,17 @@ namespace DotNetDaterbaser.TestPrepApplication
             await connection.OpenAsync().ConfigureAwait(false);
 
             const string tableSql = "SELECT TABLE_SCHEMA, TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'";
-            using var cmd = new SqlCommand(tableSql, connection);
-            using var reader = await cmd.ExecuteReaderAsync().ConfigureAwait(false);
             var tables = new List<(string Schema, string Name)>();
-            while (await reader.ReadAsync().ConfigureAwait(false))
+
+            await using (var cmd = new SqlCommand(tableSql, connection))
+            await using (var reader = await cmd.ExecuteReaderAsync().ConfigureAwait(false))
             {
-                tables.Add((reader.GetString(0), reader.GetString(1)));
+                while (await reader.ReadAsync().ConfigureAwait(false))
+                {
+                    tables.Add((reader.GetString(0), reader.GetString(1)));
+                }
             }
+
             foreach (var (schema, name) in tables)
             {
                 var sql = $"DROP TABLE [{schema}].[{name}]";
