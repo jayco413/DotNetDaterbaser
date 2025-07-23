@@ -86,6 +86,7 @@ namespace DotNetDaterbaser
                 var builder = new SqlConnectionStringBuilder(conn);
                 var server = builder.DataSource.Replace("\\", "_").Replace("/", "_").Replace(":", "_");
                 var database = builder.InitialCatalog;
+                Console.WriteLine($"Processing scripts for {server}/{database}");
                 var key = $"{server}_{database}";
                 if (!tracking.TryGetValue(key, out var entry))
                 {
@@ -106,9 +107,18 @@ namespace DotNetDaterbaser
                 // Execute the full script if it has not yet been run
                 if (!entry.FullRun && File.Exists(fullFile))
                 {
+                    Console.WriteLine($"Running full script {Path.GetFileName(fullFile)}");
                     await RunSqlScriptAsync(conn, await File.ReadAllTextAsync(fullFile));
                     entry.FullRun = true;
                     await File.AppendAllTextAsync(logFile, $"Ran full script {Path.GetFileName(fullFile)}{Environment.NewLine}");
+                }
+                else if (entry.FullRun)
+                {
+                    Console.WriteLine("Full script already run, skipping");
+                }
+                else
+                {
+                    Console.WriteLine("No full script found, skipping");
                 }
 
                 // Execute any new partial scripts
@@ -117,9 +127,14 @@ namespace DotNetDaterbaser
                     var name = Path.GetFileName(p);
                     if (!entry.Scripts.Contains(name))
                     {
+                        Console.WriteLine($"Running script {name}");
                         await RunSqlScriptAsync(conn, await File.ReadAllTextAsync(p));
                         entry.Scripts.Add(name);
                         await File.AppendAllTextAsync(logFile, $"Ran script {name}{Environment.NewLine}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Skipping script {name}");
                     }
                 }
             }
