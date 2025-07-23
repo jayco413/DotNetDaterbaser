@@ -1,4 +1,5 @@
 using Microsoft.Data.SqlClient;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace DotNetDaterbaser.TestPrepApplication
@@ -38,6 +39,8 @@ namespace DotNetDaterbaser.TestPrepApplication
             {
                 await RunSqlScriptAsync(gamma, await File.ReadAllTextAsync(file));
             }
+
+            await UpdateTrackingAsync(gamma, scriptsDir, partials);
         }
 
         private static async Task DropTablesAsync(string connectionString)
@@ -85,6 +88,41 @@ namespace DotNetDaterbaser.TestPrepApplication
                 RegexOptions.Multiline | RegexOptions.IgnoreCase);
 
             return batches.Where(static batch => !string.IsNullOrWhiteSpace(batch));
+        }
+
+        private static async Task UpdateTrackingAsync(string connectionString, string scriptsDir, IEnumerable<string> partials)
+        {
+            var trackingPath = Path.Combine(scriptsDir, "tracking.json");
+            Dictionary<string, TrackingEntry> tracking;
+
+            if (File.Exists(trackingPath))
+            {
+                var json = await File.ReadAllTextAsync(trackingPath).ConfigureAwait(false);
+                tracking = JsonSerializer.Deserialize<Dictionary<string, TrackingEntry>>(json) ?? new();
+            }
+            else
+            {
+                tracking = new Dictionary<string, TrackingEntry>();
+            }
+
+            var builder = new SqlConnectionStringBuilder(connectionString);
+            var server = builder.DataSource.Replace("\\", "_").Replace("/", "_").Replace(":", "_");
+            var key = $"{server}_{builder.InitialCatalog}";
+
+            if (!tracking.TryGetValue(key, out var entry))
+            {
+                entry = new TrackingEntry();
+                tracking[key] = entry;
+            }
+
+            entry.FullRun = true;
+            foreach (var file in partials)
+            {
+                entry.Scripts.Add(Path.GetFileName(file));
+            }
+
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            await File.WriteAllTextAsync(trackingPath, JsonSerializer.Serialize(tracking, options)).ConfigureAwait(false);
         }
     }
 }
