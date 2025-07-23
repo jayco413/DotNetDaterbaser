@@ -1,4 +1,5 @@
 using Microsoft.Data.SqlClient;
+using System.Text.RegularExpressions;
 
 namespace DotNetDaterbaser.TestPrepApplication
 {
@@ -68,8 +69,22 @@ namespace DotNetDaterbaser.TestPrepApplication
         {
             using var connection = new SqlConnection(connectionString);
             await connection.OpenAsync().ConfigureAwait(false);
-            using var command = new SqlCommand(sql, connection);
-            await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+
+            foreach (var batch in SplitSqlBatches(sql))
+            {
+                using var command = new SqlCommand(batch, connection);
+                await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+            }
+        }
+
+        private static IEnumerable<string> SplitSqlBatches(string sql)
+        {
+            var batches = Regex.Split(
+                sql,
+                @"^\s*GO\s*(?:\r?\n|$)",
+                RegexOptions.Multiline | RegexOptions.IgnoreCase);
+
+            return batches.Where(static batch => !string.IsNullOrWhiteSpace(batch));
         }
     }
 }
