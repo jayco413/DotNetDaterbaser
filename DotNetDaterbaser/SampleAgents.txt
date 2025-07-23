@@ -1,0 +1,2 @@
+This is a sample AGENTS file.
+It can be customized by the consumer project.
