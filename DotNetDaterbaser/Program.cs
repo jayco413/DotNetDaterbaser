@@ -15,19 +15,24 @@ namespace DotNetDaterbaser
         /// <returns>Zero for success, non-zero otherwise.</returns>
         public static async Task<int> Main(string[] args)
         {
+            // Expect one or more connection strings followed by the output and
+            // script directories
             if (args.Length < 3)
             {
                 Console.WriteLine("Usage: DotNetDaterbaser <connectionString1> [<connectionString2> ...] <outputDir> <scriptsDir>");
                 return 1;
             }
 
+            // Split arguments into directory paths and the connection strings
             var outputDir = args[^2];
             var inputDir = args[^1];
             var connectionStrings = args.Take(args.Length - 2).ToArray();
 
+            // Ensure the required directories exist
             Directory.CreateDirectory(outputDir);
             Directory.CreateDirectory(inputDir);
 
+            // Load or create the file that tracks executed scripts
             var trackingPath = Path.Combine(inputDir, "tracking.json");
             Dictionary<string, TrackingEntry> tracking;
             if (!File.Exists(trackingPath))
@@ -48,6 +53,7 @@ namespace DotNetDaterbaser
                 }
             }
 
+            // Make sure tracking.json is ignored by git
             var gitignorePath = Path.Combine(inputDir, ".gitignore");
             if (!File.Exists(gitignorePath))
             {
@@ -62,6 +68,7 @@ namespace DotNetDaterbaser
                 }
             }
 
+            // Copy a sample AGENTS file to the scripts directory if needed
             var agentsPath = Path.Combine(inputDir, "AGENTS.md");
             if (!File.Exists(agentsPath))
             {
@@ -72,6 +79,7 @@ namespace DotNetDaterbaser
                 }
             }
 
+            // Process each connection separately
             foreach (var conn in connectionStrings)
             {
                 var builder = new SqlConnectionStringBuilder(conn);
@@ -84,6 +92,7 @@ namespace DotNetDaterbaser
                     tracking[key] = entry;
                 }
 
+                // Determine the script files for this server and database
                 var prefix = $"{server}_{database}_";
                 var fullFile = Path.Combine(inputDir, $"{prefix}full_database_script.sql");
                 var partials = Directory.GetFiles(inputDir, $"{prefix}*_script.sql")
@@ -93,6 +102,7 @@ namespace DotNetDaterbaser
 
                 var logFile = Path.Combine(outputDir, $"{key}.log");
 
+                // Run the full database script once before applying partial scripts
                 if (!entry.FullRun && File.Exists(fullFile))
                 {
                     await RunSqlScriptAsync(conn, await File.ReadAllTextAsync(fullFile));
@@ -105,6 +115,7 @@ namespace DotNetDaterbaser
                 }
                 else
                 {
+                    // Execute any new partial scripts
                     foreach (var p in partials)
                     {
                         var name = Path.GetFileName(p);
