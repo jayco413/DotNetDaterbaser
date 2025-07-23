@@ -1,0 +1,71 @@
+using Microsoft.Data.SqlClient;
+
+namespace DotNetDaterbaser.TestPrepApplication
+{
+    /// <summary>
+    /// Prepares databases for tests by clearing existing tables and
+    /// applying the Gamma full script and the first five partial scripts.
+    /// </summary>
+    public static class Program
+    {
+        /// <summary>
+        /// Main entry point for the prep application.
+        /// </summary>
+        /// <returns>An awaitable task.</returns>
+        public static async Task Main()
+        {
+            var alpha = "Server=localhost;Database=DotNetDaterbaserAlpha;Trusted_Connection=True;TrustServerCertificate=True";
+            var beta = "Server=localhost;Database=DotNetDaterbaserBeta;Trusted_Connection=True;TrustServerCertificate=True";
+            var gamma = "Server=localhost;Database=DotNetDaterbaserGamma;Trusted_Connection=True;TrustServerCertificate=True";
+
+            var connections = new[] { alpha, beta, gamma };
+            foreach (var cs in connections)
+            {
+                await DropTablesAsync(cs).ConfigureAwait(false);
+            }
+
+            var scriptsDir = Path.Combine(AppContext.BaseDirectory, "..", "DotNetDaterbaser.TestApplication", "Scripts");
+            var prefix = "localhost_DotNetDaterbaserGamma_";
+            var full = Path.Combine(scriptsDir, $"{prefix}full_database_script.sql");
+            var partials = Directory.GetFiles(scriptsDir, $"{prefix}*_script.sql")
+                .Where(f => !f.EndsWith("full_database_script.sql", StringComparison.OrdinalIgnoreCase))
+                .OrderBy(f => f)
+                .Take(5);
+
+            await RunSqlScriptAsync(gamma, await File.ReadAllTextAsync(full));
+            foreach (var file in partials)
+            {
+                await RunSqlScriptAsync(gamma, await File.ReadAllTextAsync(file));
+            }
+        }
+
+        private static async Task DropTablesAsync(string connectionString)
+        {
+            using var connection = new SqlConnection(connectionString);
+            await connection.OpenAsync().ConfigureAwait(false);
+
+            const string tableSql = "SELECT TABLE_SCHEMA, TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'";
+            using var cmd = new SqlCommand(tableSql, connection);
+            using var reader = await cmd.ExecuteReaderAsync().ConfigureAwait(false);
+            var tables = new List<(string Schema, string Name)>();
+            while (await reader.ReadAsync().ConfigureAwait(false))
+            {
+                tables.Add((reader.GetString(0), reader.GetString(1)));
+            }
+            foreach (var (schema, name) in tables)
+            {
+                var sql = $"DROP TABLE [{schema}].[{name}]";
+                using var dropCmd = new SqlCommand(sql, connection);
+                await dropCmd.ExecuteNonQueryAsync().ConfigureAwait(false);
+            }
+        }
+
+        private static async Task RunSqlScriptAsync(string connectionString, string sql)
+        {
+            using var connection = new SqlConnection(connectionString);
+            await connection.OpenAsync().ConfigureAwait(false);
+            using var command = new SqlCommand(sql, connection);
+            await command.ExecuteNonQueryAsync().ConfigureAwait(false);
+        }
+    }
+}

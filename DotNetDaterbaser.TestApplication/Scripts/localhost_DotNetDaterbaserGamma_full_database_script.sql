@@ -3,3 +3,4 @@ CREATE TABLE TestTable (
     Name NVARCHAR(100) NOT NULL,
     CreatedOn DATETIME NOT NULL
 );
+GO

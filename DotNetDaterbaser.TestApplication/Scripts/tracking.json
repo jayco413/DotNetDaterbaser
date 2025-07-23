@@ -1,0 +1,12 @@
+{
+  "localhost_DotNetDaterbaserGamma": {
+    "FullRun": true,
+    "Scripts": [
+      "localhost_DotNetDaterbaserGamma_20240101000000_Part1_script.sql",
+      "localhost_DotNetDaterbaserGamma_20240102000000_Part2_script.sql",
+      "localhost_DotNetDaterbaserGamma_20240103000000_Part3_script.sql",
+      "localhost_DotNetDaterbaserGamma_20240104000000_Part4_script.sql",
+      "localhost_DotNetDaterbaserGamma_20240105000000_Part5_script.sql"
+    ]
+  }
+}

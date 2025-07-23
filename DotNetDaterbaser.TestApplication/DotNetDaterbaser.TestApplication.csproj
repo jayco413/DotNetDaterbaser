@@ -6,11 +6,13 @@
     <Nullable>enable</Nullable>
     <AlphaConnection>Server=localhost;Database=DotNetDaterbaserAlpha;Trusted_Connection=True;TrustServerCertificate=True</AlphaConnection>
     <BetaConnection>Server=localhost;Database=DotNetDaterbaserBeta;Trusted_Connection=True;TrustServerCertificate=True</BetaConnection>
+    <GammaConnection>Server=localhost;Database=DotNetDaterbaserGamma;Trusted_Connection=True;TrustServerCertificate=True</GammaConnection>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\DotNetDaterbaser\DotNetDaterbaser.csproj" />
   </ItemGroup>
-  <Target Name="RunDotNetDaterbaser" BeforeTargets="PreBuildEvent">
-    <Exec Command="dotnet &quot;$(MSBuildThisFileDirectory)..\DotNetDaterbaser\bin\$(Configuration)\net9.0\DotNetDaterbaser.dll&quot; &quot;$(AlphaConnection)&quot; &quot;$(BetaConnection)&quot; &quot;$(MSBuildThisFileDirectory)Logs&quot; &quot;$(MSBuildThisFileDirectory)Scripts&quot;" />
+  <Target Name="PrepDatabases" BeforeTargets="Build">
+    <Exec Command="dotnet run --project ../DotNetDaterbaser.TestPrepApplication" />
+    <Exec Command="dotnet run --project ../DotNetDaterbaser --no-build &quot;$(AlphaConnection)&quot; &quot;$(BetaConnection)&quot; &quot;$(GammaConnection)&quot; $(MSBuildProjectDirectory)/Logs $(MSBuildProjectDirectory)/Scripts" />
   </Target>
 </Project>
