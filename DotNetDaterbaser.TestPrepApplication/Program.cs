@@ -24,7 +24,7 @@ namespace DotNetDaterbaser.TestPrepApplication
                 await DropTablesAsync(cs).ConfigureAwait(false);
             }
 
-            var scriptsDir = Path.Combine(AppContext.BaseDirectory, "..", "DotNetDaterbaser.TestApplication", "Scripts");
+            var scriptsDir = Path.Combine(Environment.CurrentDirectory, "Scripts");
             var prefix = "localhost_DotNetDaterbaserGamma_";
             var full = Path.Combine(scriptsDir, $"{prefix}full_database_script.sql");
             var partials = Directory.GetFiles(scriptsDir, $"{prefix}*_script.sql")
