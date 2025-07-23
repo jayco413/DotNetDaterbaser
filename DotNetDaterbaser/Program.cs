@@ -102,34 +102,23 @@ namespace DotNetDaterbaser
 
                 var logFile = Path.Combine(outputDir, $"{key}.log");
 
-                // Run the full database script once before applying partial scripts
+                // Execute the full script if it has not yet been run
                 if (!entry.FullRun && File.Exists(fullFile))
                 {
                     await RunSqlScriptAsync(conn, await File.ReadAllTextAsync(fullFile));
                     entry.FullRun = true;
-
-                    foreach (var p in partials)
-                    {
-                        await RunSqlScriptAsync(conn, await File.ReadAllTextAsync(p));
-                        var name = Path.GetFileName(p);
-                        entry.Scripts.Add(name);
-                        await File.AppendAllTextAsync(logFile, $"Ran script {name}{Environment.NewLine}");
-                    }
-
                     await File.AppendAllTextAsync(logFile, $"Ran full script {Path.GetFileName(fullFile)}{Environment.NewLine}");
                 }
-                else
+
+                // Execute any new partial scripts
+                foreach (var p in partials)
                 {
-                    // Execute any new partial scripts
-                    foreach (var p in partials)
+                    var name = Path.GetFileName(p);
+                    if (!entry.Scripts.Contains(name))
                     {
-                        var name = Path.GetFileName(p);
-                        if (!entry.Scripts.Contains(name))
-                        {
-                            await RunSqlScriptAsync(conn, await File.ReadAllTextAsync(p));
-                            entry.Scripts.Add(name);
-                            await File.AppendAllTextAsync(logFile, $"Ran script {name}{Environment.NewLine}");
-                        }
+                        await RunSqlScriptAsync(conn, await File.ReadAllTextAsync(p));
+                        entry.Scripts.Add(name);
+                        await File.AppendAllTextAsync(logFile, $"Ran script {name}{Environment.NewLine}");
                     }
                 }
             }
