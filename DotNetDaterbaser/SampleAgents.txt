@@ -1,2 +1,19 @@
-This is a sample AGENTS file.
-It can be customized by the consumer project.
+# SQL Script Directory
+
+Follow these conventions when preparing the folder of scripts consumed by DotNetDaterbaser.
+
+1. Choose a single directory to hold all `.sql` files.
+2. Prefix each file with the server and database names, e.g. `MyServer_MyDb_`.
+3. After the database is initially created, include a `full_database_script.sql` file named:
+   
+   ```
+   <server>_<database>_full_database_script.sql
+   ```
+   
+   This script is executed once to create the database from scratch.
+4. Additional incremental scripts must end with `_script.sql` and include both a timestamp and a short description:
+   
+   ```
+   <server>_<database>_<yyyyMMddHHmmss>_<description>_script.sql
+   ```
+5. Keep `tracking.json` and this `AGENTS.md` file in the same directory. They are maintained by DotNetDaterbaser.
