@@ -1,10 +1,16 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <AlphaConnection>Server=localhost;Database=DotNetDaterbaserAlpha;Trusted_Connection=True;TrustServerCertificate=True</AlphaConnection>
+    <BetaConnection>Server=localhost;Database=DotNetDaterbaserBeta;Trusted_Connection=True;TrustServerCertificate=True</BetaConnection>
   </PropertyGroup>
-
+  <ItemGroup>
+    <ProjectReference Include="..\DotNetDaterbaser\DotNetDaterbaser.csproj" />
+  </ItemGroup>
+  <Target Name="RunDotNetDaterbaser" BeforeTargets="PreBuildEvent">
+    <Exec Command="dotnet &quot;$(MSBuildThisFileDirectory)..\DotNetDaterbaser\bin\$(Configuration)\net9.0\DotNetDaterbaser.dll&quot; &quot;$(AlphaConnection)&quot; &quot;$(BetaConnection)&quot; &quot;$(MSBuildThisFileDirectory)Logs&quot; &quot;$(MSBuildThisFileDirectory)Scripts&quot;" />
+  </Target>
 </Project>
