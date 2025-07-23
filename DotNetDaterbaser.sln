@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36310.24 d17.14
+VisualStudioVersion = 17.14.36310.24
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetDaterbaser", "DotNetDaterbaser\DotNetDaterbaser.csproj", "{46D3E475-699D-47F3-A4B4-DCE72DEE7546}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetDaterbaser.TestApplication", "DotNetDaterbaser.TestApplication\DotNetDaterbaser.TestApplication.csproj", "{F6A395BB-C4E0-4EFE-BE12-D38969775B26}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{46D3E475-699D-47F3-A4B4-DCE72DEE7546}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{46D3E475-699D-47F3-A4B4-DCE72DEE7546}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{46D3E475-699D-47F3-A4B4-DCE72DEE7546}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6A395BB-C4E0-4EFE-BE12-D38969775B26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6A395BB-C4E0-4EFE-BE12-D38969775B26}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6A395BB-C4E0-4EFE-BE12-D38969775B26}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6A395BB-C4E0-4EFE-BE12-D38969775B26}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
