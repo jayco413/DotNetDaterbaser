@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
-
-namespace ExampleCorp.DotNetDaterbaser
+namespace DotNetDaterbaser
 {
     /// <summary>
     /// Tracks which database scripts have been executed for a given server and database.

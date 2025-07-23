@@ -51,6 +51,7 @@ public class UserService
 ## 3. Namespaces
 
 - All code must be declared within a logically grouped namespace.
+- Namespace names should match the folder structure.
 - Use the block-scoped namespace declaration introduced in C# 10+.
 - Namespace names should follow the format: `Company.Product.Module`.
 
@@ -248,3 +249,22 @@ public async Task<string> LoadDataAsync()
 
 ---
 ```
+
+## 16. Implicit Usings
+
+- Implicit `using` directives are **enabled** to reduce boilerplate and maintain clean top-of-file declarations.
+- Grayed-out `using` statements (whether implicitly included or unused) **must be deleted**.
+- Developers are responsible for removing any unnecessary `using` directives that are:
+  - Redundant due to implicit usings (e.g., `System`, `System.IO`, `System.Linq`)
+  - Not referenced in the file
+
+This keeps files minimal and reduces noise without sacrificing clarity.
+
+To view which namespaces are included implicitly, refer to:
+- https://learn.microsoft.com/en-us/dotnet/core/project-sdk/overview#implicit-using-directives
+- Project type (Console, ASP.NET, etc.) determines which namespaces are included automatically
+
+✅ Tools:
+- Visual Studio: Right-click → “Remove Unused Usings”
+- `dotnet format` CLI
+- ReSharper: Code cleanup profiles
