@@ -16,6 +16,7 @@ namespace DotNetDaterbaser.TestPrepApplication
         /// <returns>An awaitable task.</returns>
         public static async Task Main()
         {
+            Console.WriteLine("Clearing and initializing test databases...");
             var alpha = "Server=localhost;Database=DotNetDaterbaserAlpha;Trusted_Connection=True;TrustServerCertificate=True";
             var beta = "Server=localhost;Database=DotNetDaterbaserBeta;Trusted_Connection=True;TrustServerCertificate=True";
             var gamma = "Server=localhost;Database=DotNetDaterbaserGamma;Trusted_Connection=True;TrustServerCertificate=True";
@@ -24,6 +25,8 @@ namespace DotNetDaterbaser.TestPrepApplication
             foreach (var cs in connections)
             {
                 await DropTablesAsync(cs).ConfigureAwait(false);
+                var db = new SqlConnectionStringBuilder(cs).InitialCatalog;
+                Console.WriteLine($"Cleared {db}");
             }
 
             var scriptsDir = Path.Combine(Environment.CurrentDirectory, "Scripts");
@@ -34,13 +37,16 @@ namespace DotNetDaterbaser.TestPrepApplication
                 .OrderBy(f => f)
                 .Take(5);
 
+            Console.WriteLine($"Applying full script {Path.GetFileName(full)}");
             await RunSqlScriptAsync(gamma, await File.ReadAllTextAsync(full));
             foreach (var file in partials)
             {
+                Console.WriteLine($"Applying partial script {Path.GetFileName(file)}");
                 await RunSqlScriptAsync(gamma, await File.ReadAllTextAsync(file));
             }
 
             await UpdateTrackingAsync(gamma, scriptsDir, partials);
+            Console.WriteLine("Tracking file updated.");
         }
 
         private static async Task DropTablesAsync(string connectionString)
