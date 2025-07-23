@@ -16,6 +16,7 @@ namespace DotNetDaterbaser
         /// <returns>Zero for success, non-zero otherwise.</returns>
         public static async Task<int> Main(string[] args)
         {
+            Console.WriteLine("DotNetDaterbaser starting...");
             // Expect one or more connection strings followed by the output and
             // script directories
             if (args.Length < 3)

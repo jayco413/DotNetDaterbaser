@@ -11,8 +11,8 @@ namespace DotNetDaterbaser
         public bool FullRun { get; set; }
 
         /// <summary>
-        /// Gets the set of individual script names that have executed.
+        /// Gets or sets the set of individual script names that have executed.
         /// </summary>
-        public HashSet<string> Scripts { get; } = new(StringComparer.OrdinalIgnoreCase);
+        public HashSet<string> Scripts { get; set; } = new(StringComparer.OrdinalIgnoreCase);
     }
 }
