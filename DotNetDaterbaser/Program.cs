@@ -107,10 +107,15 @@ namespace DotNetDaterbaser
                 {
                     await RunSqlScriptAsync(conn, await File.ReadAllTextAsync(fullFile));
                     entry.FullRun = true;
+
                     foreach (var p in partials)
                     {
-                        entry.Scripts.Add(Path.GetFileName(p));
+                        await RunSqlScriptAsync(conn, await File.ReadAllTextAsync(p));
+                        var name = Path.GetFileName(p);
+                        entry.Scripts.Add(name);
+                        await File.AppendAllTextAsync(logFile, $"Ran script {name}{Environment.NewLine}");
                     }
+
                     await File.AppendAllTextAsync(logFile, $"Ran full script {Path.GetFileName(fullFile)}{Environment.NewLine}");
                 }
                 else
