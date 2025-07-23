@@ -16,6 +16,7 @@ namespace DotNetDaterbaser.TestPrepApplication
         /// <returns>An awaitable task.</returns>
         public static async Task Main()
         {
+            Console.WriteLine("DotNetDaterbaser.TestPrepApplication starting...");
             Console.WriteLine("Clearing and initializing test databases...");
             var alpha = "Server=localhost;Database=DotNetDaterbaserAlpha;Trusted_Connection=True;TrustServerCertificate=True";
             var beta = "Server=localhost;Database=DotNetDaterbaserBeta;Trusted_Connection=True;TrustServerCertificate=True";

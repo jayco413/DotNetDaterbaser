@@ -13,6 +13,7 @@ namespace DotNetDaterbaser.TestApplication
         /// <returns>An awaitable task.</returns>
         public static async Task Main()
         {
+            Console.WriteLine("DotNetDaterbaser.TestApplication starting...");
             var alpha = "Server=localhost;Database=DotNetDaterbaserAlpha;Trusted_Connection=True;TrustServerCertificate=True";
             var beta = "Server=localhost;Database=DotNetDaterbaserBeta;Trusted_Connection=True;TrustServerCertificate=True";
             var gamma = "Server=localhost;Database=DotNetDaterbaserGamma;Trusted_Connection=True;TrustServerCertificate=True";
