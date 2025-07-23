@@ -13,12 +13,13 @@ namespace DotNetDaterbaser.TestApplication
         /// <returns>An awaitable task.</returns>
         public static async Task Main()
         {
-            var databases = new[] { "DotNetDaterbaserAlpha", "DotNetDaterbaserBeta" };
-            foreach (var db in databases)
-            {
-                var cs = $"Server=localhost;Database={db};Trusted_Connection=True;TrustServerCertificate=True";
-                await VerifyTablesAsync(cs);
-            }
+            var alpha = "Server=localhost;Database=DotNetDaterbaserAlpha;Trusted_Connection=True;TrustServerCertificate=True";
+            var beta = "Server=localhost;Database=DotNetDaterbaserBeta;Trusted_Connection=True;TrustServerCertificate=True";
+            var gamma = "Server=localhost;Database=DotNetDaterbaserGamma;Trusted_Connection=True;TrustServerCertificate=True";
+
+            await VerifyNoTablesAsync(alpha).ConfigureAwait(false);
+            await VerifyTablesAsync(beta).ConfigureAwait(false);
+            await VerifyGammaAsync(gamma).ConfigureAwait(false);
 
             Console.WriteLine("Database verification succeeded.");
         }
@@ -56,5 +57,34 @@ namespace DotNetDaterbaser.TestApplication
                 }
             }
         }
+
+        private static async Task VerifyNoTablesAsync(string connectionString)
+        {
+            using var connection = new SqlConnection(connectionString);
+            await connection.OpenAsync().ConfigureAwait(false);
+
+            const string tableCheck = "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'";
+            using var cmd = new SqlCommand(tableCheck, connection);
+            var count = (int)await cmd.ExecuteScalarAsync().ConfigureAwait(false);
+            if (count != 0)
+            {
+                throw new InvalidOperationException($"Expected no tables in {connectionString}");
+            }
+        }
+
+        private static async Task VerifyGammaAsync(string connectionString)
+        {
+            using var connection = new SqlConnection(connectionString);
+            await connection.OpenAsync().ConfigureAwait(false);
+
+            const string countRows = "SELECT COUNT(*) FROM TestTable";
+            using var cmd = new SqlCommand(countRows, connection);
+            var count = (int)await cmd.ExecuteScalarAsync().ConfigureAwait(false);
+            if (count != 10)
+            {
+                throw new InvalidOperationException($"Expected 10 rows in TestTable for {connectionString}");
+            }
+        }
+
     }
 }
