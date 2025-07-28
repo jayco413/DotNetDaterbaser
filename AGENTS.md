@@ -77,8 +77,6 @@ public class UserService
 - All code must be declared within a logically grouped namespace.
 - Namespace names should match the folder structure.
 - Use the block-scoped namespace declaration introduced in C# 10+.
-- Namespace names should follow the format: `Company.Product.Module`.
-
 Example:
 ```csharp
 namespace MyCompany.MyApp.Services
