@@ -10,25 +10,10 @@ This repository contains a simple .NET command line tool. The project files live
     # 2 — Build the main solution / project
     dotnet build --configuration Release --no-restore
 
-    # 3 — (Optional) Start SQL Server container for integration testing
-    docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=YourStrong!Passw0rd" \
-      -p 1433:1433 --name test-sqlserver \
-      -d mcr.microsoft.com/mssql/server:2022-latest
-
-    # Wait for SQL Server to become ready
-    sleep 10
-
-    # (Optional) Create a test database
-    # docker exec -it test-sqlserver /opt/mssql-tools/bin/sqlcmd \
-    #   -S localhost -U sa -P 'YourStrong!Passw0rd' -Q "CREATE DATABASE TestDb"
-
-    # 4 — Run tests if you have them
+    # 3 — Run tests if you have them
     if find . -name '*Tests.csproj' | grep -q .; then
       dotnet test --no-build --verbosity normal
     fi
-
-    # 5 — (Optional) Stop and remove the SQL Server container
-    docker stop test-sqlserver && docker rm test-sqlserver
 
 ## Connection String
 
