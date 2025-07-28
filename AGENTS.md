@@ -272,7 +272,6 @@ public async Task<string> LoadDataAsync()
 ```
 
 ---
-```
 
 ## 16. Implicit Usings
 
